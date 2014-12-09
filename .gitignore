@@ -1,3 +1,6 @@
 .DS_Store
 *.pyc
 *.root
+*.d
+*.so
+test.*
