@@ -26,7 +26,7 @@ using namespace std;
 GuiController::GuiController(const TGWindow *p, int w, int h)
 {
 
-    baseDir = baseDir + gSystem->DirName(__FILE__) + "/../..";
+    baseDir = baseDir + gSystem->DirName(__FILE__) + "/..";
     event = 0;
 
     mw = new MainWindow(p, w, h);
@@ -190,7 +190,7 @@ void GuiController::InitEvent(const char* filename)
 void GuiController::MenuOpen()
 {
     const char *filetypes[] = {"ROOT files", "*.root", 0, 0};
-    TString dir(baseDir + "/rootFiles");
+    TString dir(baseDir + "/data/d2r");
     TGFileInfo fi;
     fi.fFileTypes = filetypes;
     fi.fIniDir    = StrDup(dir);

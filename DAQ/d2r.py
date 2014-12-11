@@ -58,7 +58,7 @@ class D2R:
             self.eventNo = array("i", [0])
             self.triggerTime = array("d", [0])    # trigger time since file start
 
-            maxSample = 300
+            maxSample = 500
             for i in range(numCh):
                 setattr(self, "ch%s"%(i,), array("H", maxSample*[0]))    # channel waveform
 
@@ -84,6 +84,7 @@ class D2R:
 
         self.numCh = 1  # number of channels
         self.numSample = 252  # number of samples per waveform
+        # self.numSample = 500  # number of samples per waveform
 
         self.dateTime = 0
         self.oldTimeTag = 0.
@@ -280,9 +281,10 @@ class D2R:
                             trace[trInd:trInd + length * 2] = tmp
                         trInd += length * 2
                         m += 1 + (length if good else 0)
-                # self.traces[traceName] = trace
+                # print len(trace)
+                ch = getattr(self.event, "ch%i"%(chNo,))
                 for i, x in enumerate(trace):
-                    getattr(self.event, "ch%i"%(chNo,))[i] = x
+                    ch[i] = x
                     # self.event.pmtData[chNo].push_back(x)
                 chNo += 1
 
@@ -305,4 +307,6 @@ class D2R:
 
 if __name__ == "__main__":
     x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/HFIR_LiLS11_1/Cal_2014-12-04-04-41-30.dat")
-    x.run()
+    # x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/HFIR_LiLS11_0/120314-LiLS11-LLNL5inPMT-1453V-Co60.dat")
+
+    x.run(20000)
