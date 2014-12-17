@@ -37,10 +37,19 @@ GuiController::GuiController(const TGWindow *p, int w, int h)
     for (int i=0; i<3; i++) {
         gWF[i] = new TGraph(DAQEvent::MAX_SAMPLE);
         gWF[i]->SetLineWidth(2);
+        for (int j=0; j<2; j++) {
+            gMu[j][i] = new TGraph(DAQEvent::MAX_SAMPLE);
+            gMu[j][i]->SetLineWidth(2);
+        }
+        gMu[0][i]->SetLineColor(kGreen+1);
+        gMu[1][i]->SetLineColor(kMagenta+1);
 
         text_dt[i] = new TLatex();
         text_dt[i]->SetNDC();
         text_dt[i]->SetTextSize(0.08);
+
+        isMuon1[i] = false;
+        isMuon2[i] = false;
 
         can->GetPad(i+1)->SetGridx();
         can->GetPad(i+1)->SetGridy();
@@ -67,6 +76,7 @@ void GuiController::InitConnections()
     cw->fNextButton->Connect("Clicked()", "GuiController", this, "Next()");
     cw->fEventEntry->Connect("ReturnPressed()", "GuiController", this, "Jump()");
     cw->fNextCIButton->Connect("Clicked()", "GuiController", this, "FindNextCoincidence()");
+    cw->fNextMuonButton->Connect("Clicked()", "GuiController", this, "FindNextMuon()");
 
 }
 
@@ -128,14 +138,25 @@ void GuiController::FindNextCoincidence()
     }
 }
 
+//-------------------------------------------------
+void GuiController::FindNextMuon()
+{
+    Next();
+    while ( !isMuon1[1] && !isMuon2[1] ) {
+        Next();
+    }
+}
 
 //-------------------------------------------------
 void GuiController::DrawWF(int i)
 {   
+    // i here is the 0, 1, 2, corresponding to previous, current, next WF
     can->cd(i+1);
 
+    vector<unsigned short>& ch = *(event->ch0);
+
     for (int n=0; n<DAQEvent::MAX_SAMPLE; n++) {
-        gWF[i]->SetPoint(n, n*4, event->ch0[n]);
+        gWF[i]->SetPoint(n, n*4, ch[n]);
     }
     triggerTS[i] = event->ts;
 
@@ -149,6 +170,29 @@ void GuiController::DrawWF(int i)
     if (i!=1) { 
         text_dt[i]->Draw();
     }
+
+    // mu paddles
+    vector<unsigned short>& ch1 = *(event->ch1);
+    int size = ch1.size();
+    isMuon1[i] = false;
+    if (size>0) {
+        for (int n=0; n<size; n++) {
+            gMu[0][i]->SetPoint(n, n*4, ch1[n]);
+        }
+        gMu[0][i]->Draw("same");
+        isMuon1[i] = true;
+    }
+    vector<unsigned short>& ch2 = *(event->ch2);
+    size = ch2.size();
+    isMuon2[i] = false;
+    if (size>0) {
+        for (int n=0; n<size; n++) {
+            gMu[1][i]->SetPoint(n, n*4, ch2[n]);
+        }
+        gMu[1][i]->Draw("same");
+        isMuon2[i] = true;
+    }
+
 }
 
 

@@ -17,7 +17,7 @@
     root -l show.C
 
 
-## (If You Have [RAKE](https://github.com/jimweirich/rake) Installed)
+## (If You Have [RAKE](http://docs.seattlerb.org/rake/) Installed)
 
 ### Build the Application
     rake

@@ -28,8 +28,8 @@ class D2R:
         """
         Header Information
         """
-        def __init__(self):
-            maxCh = 8
+        def __init__(self, maxCh=8):
+            self.maxCh = maxCh
             self.runNo = array("i", [0])        # runNo
             self.startTime = array("i", [0])    # file start unix time
             self.recordLen = array("i", [0])    # bytes of each trigger
@@ -55,17 +55,18 @@ class D2R:
         Raw Trigger (Event) Information
         """
         def __init__(self, numCh):
-            self.eventNo = array("i", [0])
+            self.eventNo = array("i", [-1]) # event no will start from zero
             self.triggerTime = array("d", [0])    # trigger time since file start
 
-            maxSample = 500
+            self.triggerMap = [0, 1, -1, -1, 2, -1, -1, -1]  # maps the channel daqId to the index here
+
             for i in range(numCh):
-                setattr(self, "ch%s"%(i,), array("H", maxSample*[0]))    # channel waveform
+                setattr(self, "ch%s"%(i,), ROOT.vector('unsigned short')())    # channel waveform
 
             # self.pmtData = ROOT.vector('vector<unsigned short>')()
             # for i in range(numCh):  # each channel waveform is stored inside a vector
-            #     wf = ROOT.vector('unsigned short')()
-            #     self.pmtData.push_back(wf)
+                # wf = ROOT.vector('unsigned short')()
+                # self.pmtData.push_back(wf)
 
         def __str__(self):
             return """ Trigger %s:
@@ -82,7 +83,7 @@ class D2R:
             raise NameError("Not a data file")
         self.file = open(self.fileName, 'r')
 
-        self.numCh = 1  # number of channels
+        self.numCh = 3  # number of channels
         self.numSample = 252  # number of samples per waveform
         # self.numSample = 500  # number of samples per waveform
 
@@ -90,10 +91,9 @@ class D2R:
         self.oldTimeTag = 0.
         self.timeTagRollover = 0
 
-        self.header = D2R.Header()
+        self.header = D2R.Header(self.numCh)
         self.event = D2R.Trigger(self.numCh)
-        # for i in range(self.numCh):
-        #     self.event.pmtData[i].reserve(self.numSample)
+
 
         self.initOutput()
 
@@ -129,12 +129,12 @@ class D2R:
         # self.eventTree.Branch("pmtData", self.event.pmtData)
         for i in range(self.numCh):
             chName = "ch%i" % (i,)
-            self.eventTree.Branch(chName, getattr(self.event, chName), "%s[%i]/s" % (chName, self.numSample, ))
+            self.eventTree.Branch(chName, getattr(self.event, chName))
 
 
     def close(self):
         self.headerTree.Write()
-        self.eventTree.Write("", ROOT.TObject.kOverwrite)
+        self.eventTree.Write("", ROOT.TObject.kOverwrite)   # seems to prevent partial write
 
         # self.d2rFile.Write()
         self.d2rFile.Close()
@@ -142,9 +142,9 @@ class D2R:
 
     def reset(self):
         self.event.triggerTime[0] = 0
-        # self.event.ch0 (we don't need to reset this as it's renewed every time)
-        # for i in range(self.numCh):
-        #     self.event.pmtData[i].clear()
+        for i in range(self.numCh):
+            ch = getattr(self.event, "ch%i" % (i,))
+            ch.clear()
 
     def readHeader(self):
         """
@@ -200,7 +200,7 @@ class D2R:
         self.header.runNo[0] = 0
         self.header.startTime[0] = int(mktime(self.dateTime))
         self.header.recordLen[0] = recordLen
-        assert numCh ==  self.numCh
+        assert numCh ==  self.numCh, "daq has %s channels, converter only store %s" % (numCh, self.numCh)
         self.header.numCh[0] = self.numCh
         self.header.numSample[0] = self.numSample
         print self.header
@@ -236,7 +236,7 @@ class D2R:
         channelUse = i1 & 0x000000ff
         whichChan = [1 if (channelUse & 1 << k) else 0 for k in range(0, 8)]
         numChannels = sum(whichChan)
-        assert numChannels == self.header.numCh[0]
+        assert (numChannels <= self.header.numCh[0]), "event has %s channels, converter stores %s" % (numChannels, self.header.numCh[0])
 
         zLE = True if i1 & 0x01000000 != 0 else False
 
@@ -256,7 +256,6 @@ class D2R:
         self.event.triggerTime[0] = self.header.startTime[0]+float(self.timeTagRollover*(2**31)*8e-9)+float(i3)*8e-9
 
         size = int(4 * eventSize - 16L)
-        chNo = 0
         for ind, k in enumerate(whichChan):
             #           print "Board = ", boardId
             #           print "ChanUse = ", channelUse
@@ -282,14 +281,13 @@ class D2R:
                         trInd += length * 2
                         m += 1 + (length if good else 0)
                 # print len(trace)
+                # ch = getattr(self.event, "ch%i"%(chNo,))
+                chNo = self.event.triggerMap[ind]
                 ch = getattr(self.event, "ch%i"%(chNo,))
-                for i, x in enumerate(trace):
-                    ch[i] = x
-                    # self.event.pmtData[chNo].push_back(x)
-                chNo += 1
+                for x in trace:
+                    ch.push_back(x)
 
         self.event.eventNo[0] += 1
-        # print self.event.ch0
         self.eventTree.Fill()
         return self.event
 
@@ -306,7 +304,7 @@ class D2R:
 
 
 if __name__ == "__main__":
-    x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/HFIR_LiLS11_1/Cal_2014-12-04-04-41-30.dat")
-    # x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/HFIR_LiLS11_0/120314-LiLS11-LLNL5inPMT-1453V-Co60.dat")
+    # x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/HFIR_LiLS11_1/Cal_2014-12-04-04-41-30.dat")
+    x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/withMuonPaddles/BG_2014-12-11-12-08-59.dat")
 
-    x.run(20000)
+    x.run(2000)

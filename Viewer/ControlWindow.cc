@@ -2,6 +2,7 @@
 
 #include "TGButton.h"
 #include "TGNumberEntry.h"
+#include "TGLabel.h"
 
 #include <iostream>
 using namespace std;
@@ -25,6 +26,10 @@ ControlWindow::ControlWindow(const TGWindow *p, int w, int h)
     }
     fNextCIButton = new TGTextButton(this, "Find Next Coincidence");
     AddFrame(fNextCIButton, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 2, 2, 2, 2)); 
+
+    fNextMuonButton = new TGTextButton(this, "Find Next Muon");
+    AddFrame(fNextMuonButton, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 2, 2, 2, 2)); 
+
 }
 
 ControlWindow::~ControlWindow()

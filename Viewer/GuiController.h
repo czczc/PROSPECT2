@@ -33,11 +33,15 @@ public:
     void Next();
     void Jump();
     void FindNextCoincidence();
+    void FindNextMuon();
 
     void DrawWF(int i);
 
     TGraph *gWF[3]; // previous, current, next waveform
+    TGraph *gMu[2][3]; // previous, current, next waveform of the two muon paddles
     TTimeStamp triggerTS[3];  // previous, current, next waveform
+    bool isMuon1[3];
+    bool isMuon2[3];
     TLatex *text_dt[3];
 
     // member variables

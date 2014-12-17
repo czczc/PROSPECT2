@@ -1,6 +1,7 @@
 #ifndef MCEVENT_H
 #define MCEVENT_H
 
+#include <vector>
 #include "TTimeStamp.h"
 
 class TTree;
@@ -33,7 +34,9 @@ public:
     // eventTree leafs
     int eventNo;
     double triggerTime;
-    unsigned short ch0[MAX_SAMPLE];
+    std::vector<unsigned short> *ch0;  // pmt
+    std::vector<unsigned short> *ch1;  // mu paddle b0tr1
+    std::vector<unsigned short> *ch2;  // mu paddle b0tr4
     TTimeStamp ts; 
 
 };

@@ -1,6 +1,7 @@
 #include "DAQEvent.h"
 
 #include <iostream>
+#include <vector>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -9,6 +10,10 @@ using namespace std;
 
 DAQEvent::DAQEvent(const char* dataFileName)
 {
+    ch0 = new vector<unsigned short>;
+    ch1 = new vector<unsigned short>;
+    ch2 = new vector<unsigned short>;
+
     currentEventEntry = -1; // don't load event at initialization
 
     rootFile = new TFile(dataFileName);
@@ -41,6 +46,8 @@ void DAQEvent::InitBranchAddress()
     eventTree->SetBranchAddress("eventNo" , &eventNo);
     eventTree->SetBranchAddress("triggerTime" , &triggerTime);
     eventTree->SetBranchAddress("ch0" , &ch0);
+    eventTree->SetBranchAddress("ch1" , &ch1);
+    eventTree->SetBranchAddress("ch2" , &ch2);
 }
 
 //----------------------------------------------------------------
@@ -69,8 +76,9 @@ void DAQEvent::PrintInfo(int level)
          << endl;
     // print waveform
     if (level>0) {
-        for (int i=0; i<MAX_SAMPLE; i++) {
-            cout << ch0[i] << " ";
+        int size = (*ch0).size();
+        for (int i=0; i<size; i++) {
+            cout << (*ch0)[i] << " ";
         }
         cout << endl;
     }

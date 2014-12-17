@@ -16,6 +16,7 @@ public:
     TGNumberEntryField *fEventEntry; 
 
     TGTextButton       *fNextCIButton;
+    TGTextButton       *fNextMuonButton;
     // TGTextButton       *fUnZoomButton;
     
     ClassDef(ControlWindow, 0)
