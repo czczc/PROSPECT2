@@ -11,6 +11,7 @@
     prefix = "../Viewer";
     gROOT->ProcessLine( include + prefix );
     gROOT->ProcessLine( load + prefix + "/ViewWindow.cc+" );
+    gROOT->ProcessLine( load + prefix + "/InfoWindow.cc+" );
     gROOT->ProcessLine( load + prefix + "/ControlWindow.cc+" );
     gROOT->ProcessLine( load + prefix + "/MainWindow.cc+" );
     gROOT->ProcessLine( load + prefix + "/GuiController.cc+" );

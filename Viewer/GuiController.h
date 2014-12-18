@@ -8,8 +8,10 @@
 
 class MainWindow;
 class ViewWindow;
+class InfoWindow;
 class ControlWindow;
 class DAQEvent;
+class WFAnalyzer;
 class TCanvas;
 class TGraph;
 class TLatex;
@@ -47,8 +49,10 @@ public:
     // member variables
     MainWindow    *mw;
     ViewWindow    *vw;
+    InfoWindow    *iw;
     ControlWindow *cw;
     DAQEvent       *event;
+    WFAnalyzer     *ana;
 
     TCanvas *can;
     TString baseDir;

@@ -1,8 +1,10 @@
 #include "GuiController.h"
 #include "MainWindow.h"
 #include "ViewWindow.h"
+#include "InfoWindow.h"
 #include "ControlWindow.h"
 #include "DAQEvent.h"
+#include "WFAnalyzer.h"
 
 #include "TGButton.h"
 #include "TGNumberEntry.h"
@@ -28,10 +30,12 @@ GuiController::GuiController(const TGWindow *p, int w, int h)
 
     baseDir = baseDir + gSystem->DirName(__FILE__) + "/..";
     event = 0;
+    ana =  0;
 
     mw = new MainWindow(p, w, h);
     vw = mw->fViewWindow;
     cw = mw->fControlWindow;
+    iw = mw->fControlWindow->fInfoWindow;
     can = vw->can;
 
     for (int i=0; i<3; i++) {
@@ -202,6 +206,9 @@ void GuiController::Reload()
     cw->fEventEntry->SetNumber(currentEventEntry);
 
     event->GetEntry(currentEventEntry);
+    ana->Process();
+    iw->DrawEventInfo(event, ana);
+
     DrawWF(1);
     // event->PrintInfo(1);
     event->PrintInfo();
@@ -227,6 +234,10 @@ void GuiController::InitEvent(const char* filename)
     if (event) delete event;
     event = new DAQEvent(filename);
     currentEventEntry = 0;
+
+    if (ana) delete ana;
+    ana = new WFAnalyzer(event);
+
     Reload();
 }
 

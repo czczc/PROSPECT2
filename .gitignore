@@ -3,5 +3,6 @@
 *.root
 *.d
 *.so
+*.pdf
 test.*
 AutoDict*

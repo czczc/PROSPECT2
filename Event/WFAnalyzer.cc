@@ -77,12 +77,12 @@ void WFAnalyzer::ProcessPMT()
     double charge = 0;
     double tdc = 0;
     bool foundPulse = false;
-    const int THRESHOLD = 20; // threshold for tdc start
+    const int THRESHOLD = 10; // threshold for register a pulse and for tdc start 
     for (unsigned i=0; i<NSAMPLES-1; i++) {
         if (cleanTrace[i]>0 && cleanTrace[i+1]>0) {
             foundPulse = true;
             charge += cleanTrace[i];
-            if(cleanTrace[i]<THRESHOLD && cleanTrace[i+1]>THRESHOLD && tdc<0.1) tdc = i;
+            if(i>0 && tdc<0.1 && cleanTrace[i-1]<THRESHOLD && cleanTrace[i]>THRESHOLD) tdc = i;
         }
         else {
             if(foundPulse && tdc>0.1) {
@@ -106,7 +106,7 @@ void WFAnalyzer::ProcessPMT()
         totalCharge += pulses[i];
         if (pulses[i] > maxCharge) {
             maxCharge = pulses[i];
-            riseTime = tdcs[i];
+            riseTime = tdcs[i] * 4;  // 4 ns per sample
         }
     }
 

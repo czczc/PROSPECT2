@@ -1,4 +1,5 @@
 #include "ControlWindow.h"
+#include "InfoWindow.h"
 
 #include "TGButton.h"
 #include "TGNumberEntry.h"
@@ -10,6 +11,9 @@ using namespace std;
 ControlWindow::ControlWindow(const TGWindow *p, int w, int h)
     :TGVerticalFrame(p, w, h)
 {    
+    fInfoWindow = new InfoWindow(this, w, 200); 
+    AddFrame(fInfoWindow, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 2, 2, 2, 2));
+    
     // Navigation Frame
     TGHorizontalFrame *navigationFrame = new TGHorizontalFrame(this, w, 100, kFixedWidth);
     AddFrame(navigationFrame, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 2, 2, 2, 2));
