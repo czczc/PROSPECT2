@@ -5,6 +5,7 @@
     TString prefix = "../Event";
     gROOT->ProcessLine( include + prefix );
     gROOT->ProcessLine( load + prefix + "/DAQEvent.cc+" );
+    gROOT->ProcessLine( load + prefix + "/WFAnalyzer.cc+" );
 
     prefix = "../Viewer";
     gROOT->ProcessLine( include + prefix );
