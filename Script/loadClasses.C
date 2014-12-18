@@ -6,6 +6,7 @@
     gROOT->ProcessLine( include + prefix );
     gROOT->ProcessLine( load + prefix + "/DAQEvent.cc+" );
     gROOT->ProcessLine( load + prefix + "/WFAnalyzer.cc+" );
+    gROOT->ProcessLine( load + prefix + "/RecEvent.cc+" );
 
     prefix = "../Viewer";
     gROOT->ProcessLine( include + prefix );

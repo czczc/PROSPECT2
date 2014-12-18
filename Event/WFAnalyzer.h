@@ -12,9 +12,15 @@ public:
     void ProcessPMT();
 
     DAQEvent* fEvent;
-    double fBaseline;
-    int fNPulses;
-    vector<double> fCharge;
+    
+    double baseline;
+    int nPulses;
+    double maxCharge;
+    double riseTime;
+    double totalCharge;
+
+    // int nPulses;
+    // vector<double> charge;
 
 };
 
