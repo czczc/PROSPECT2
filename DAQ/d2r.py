@@ -231,7 +231,7 @@ class D2R:
         if sanity == 0:
             raise IOError('Read did not pass sanity check')
         eventSize = i0 - 0xa0000000
-        # print "eventSize:",eventSize
+
         boardId = (i1 & 0xf8000000) >> 27
         channelUse = i1 & 0x000000ff
         whichChan = [1 if (channelUse & 1 << k) else 0 for k in range(0, 8)]
@@ -256,6 +256,8 @@ class D2R:
         self.event.triggerTime[0] = self.header.startTime[0]+float(self.timeTagRollover*(2**31)*8e-9)+float(i3)*8e-9
 
         size = int(4 * eventSize - 16L)
+        print "event: ", self.event.eventNo[0]+1, ", size: ", size
+
         for ind, k in enumerate(whichChan):
             #           print "Board = ", boardId
             #           print "ChanUse = ", channelUse
@@ -307,4 +309,4 @@ if __name__ == "__main__":
     # x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/HFIR_LiLS11_1/Cal_2014-12-04-04-41-30.dat")
     x = D2R("/Users/chaozhang/Projects/PROSPECT/PROSPECT2/data/withMuonPaddles/BG_2014-12-11-12-08-59.dat")
 
-    x.run(2000)
+    x.run(225)

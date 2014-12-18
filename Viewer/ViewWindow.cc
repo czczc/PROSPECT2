@@ -29,6 +29,8 @@ void ViewWindow::InitCanvas()
 {
     can->cd();
     can->Divide(1, 3, 0.005, 0.005);
+    // can->cd(2);
+    // gPad->SetFillColor(kYellow-10);
 }
 
 void ViewWindow::InitStyle()

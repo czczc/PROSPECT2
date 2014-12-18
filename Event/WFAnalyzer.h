@@ -10,9 +10,10 @@ public:
     
     void Process();
     void ProcessPMT();
-
-    DAQEvent* fEvent;
+    void Reset();
     
+    DAQEvent* fEvent;
+
     double baseline;
     int nPulses;
     double maxCharge;

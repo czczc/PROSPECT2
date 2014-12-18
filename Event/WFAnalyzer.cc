@@ -8,8 +8,7 @@
 using namespace std;
 
 WFAnalyzer::WFAnalyzer(DAQEvent *evt):
-fEvent(evt),
-baseline(0)
+fEvent(evt)
 {
 }
 
@@ -22,7 +21,18 @@ WFAnalyzer::~WFAnalyzer()
 // ------------------------------------
 void WFAnalyzer::Process()
 {
+    Reset();
     ProcessPMT();
+}
+
+// ------------------------------------
+void WFAnalyzer::Reset()
+{
+    baseline = 0;
+    nPulses = 0;
+    maxCharge = 0;
+    riseTime = 0;
+    totalCharge = 0;
 }
 
 // ------------------------------------
@@ -32,6 +42,10 @@ void WFAnalyzer::ProcessPMT()
     // for (int i=0; i< NSAMPLES; i++) {
     //     trace[i] = (*(fEvent->ch0))[i]; 
     // }
+
+    if (fEvent->ch0->size() == 0) {
+        return;
+    }
 
     unsigned short *trace = &(*(fEvent->ch0))[0];
 
@@ -82,7 +96,7 @@ void WFAnalyzer::ProcessPMT()
         if (cleanTrace[i]>0 && cleanTrace[i+1]>0) {
             foundPulse = true;
             charge += cleanTrace[i];
-            if(i>0 && tdc<0.1 && cleanTrace[i-1]<THRESHOLD && cleanTrace[i]>THRESHOLD) tdc = i;
+            if(i>0 && tdc<0.1 && cleanTrace[i-1]<THRESHOLD && cleanTrace[i]>=THRESHOLD) tdc = i;
         }
         else {
             if(foundPulse && tdc>0.1) {

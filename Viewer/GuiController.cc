@@ -159,9 +159,21 @@ void GuiController::DrawWF(int i)
 
     vector<unsigned short>& ch = *(event->ch0);
 
-    for (int n=0; n<DAQEvent::MAX_SAMPLE; n++) {
-        gWF[i]->SetPoint(n, n*4, ch[n]);
+    // if (ch.size() == 0) {
+    //     cout << "size 0! " << ch.size() << endl;
+    // }
+    int size = ch.size();
+    if (size == 0) {
+        for (int n=0; n<DAQEvent::MAX_SAMPLE; n++) {
+            gWF[i]->SetPoint(n, n*4, 0);
+        }
     }
+    else {
+        for (int n=0; n<DAQEvent::MAX_SAMPLE; n++) {
+            gWF[i]->SetPoint(n, n*4, ch[n]);
+        }
+    }
+
     triggerTS[i] = event->ts;
 
     gWF[i]->SetTitle(triggerTS[i].AsString());
@@ -177,7 +189,7 @@ void GuiController::DrawWF(int i)
 
     // mu paddles
     vector<unsigned short>& ch1 = *(event->ch1);
-    int size = ch1.size();
+    size = ch1.size();
     isMuon1[i] = false;
     if (size>0) {
         for (int n=0; n<size; n++) {
